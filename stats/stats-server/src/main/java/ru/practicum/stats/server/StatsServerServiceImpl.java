@@ -34,7 +34,8 @@ public class StatsServerServiceImpl implements StatsServerService {
 
         var ipSet = new HashSet<>();
         if (unique)
-            return events.stream().filter(e -> ipSet.add(e.getIp())).map(EventMapper::toEventOutputDto).toList();
+            return events.stream().filter(e -> ipSet.add(e.getIp())).map(EventMapper::toEventOutputDto)
+                    .collect(Collectors.toList());
         return events.stream().map(EventMapper::toEventOutputDto).collect(Collectors.toList());
     }
 }
