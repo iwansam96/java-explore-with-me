@@ -6,7 +6,7 @@ import ru.practicum.stats.dto.EventInputDto;
 import ru.practicum.stats.dto.EventOutputDto;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,8 +32,9 @@ public class StatsServerServiceImpl implements StatsServerService {
         else
             events = repository.findByEventCreatedBetweenAndUriIn(start, end, uris);
 
+        var ipSet = new HashSet<>();
         if (unique)
-            return events.stream().map(EventMapper::toEventOutputDto).distinct().collect(Collectors.toList());
+            return events.stream().filter(e -> ipSet.add(e.getIp())).map(EventMapper::toEventOutputDto).toList();
         return events.stream().map(EventMapper::toEventOutputDto).collect(Collectors.toList());
     }
 }
