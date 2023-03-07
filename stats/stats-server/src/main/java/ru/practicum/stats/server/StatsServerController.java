@@ -19,7 +19,7 @@ public class StatsServerController {
     private final StatsServerService service;
 
     @PostMapping("/hit")
-    public EventOutputDto hit(@RequestBody EventInputDto eventInputDto) {
+    public Event hit(@RequestBody EventInputDto eventInputDto) {
         log.info("POST /hit");
         return service.hit(eventInputDto);
     }

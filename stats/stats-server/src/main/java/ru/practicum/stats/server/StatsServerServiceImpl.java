@@ -6,7 +6,8 @@ import ru.practicum.stats.dto.EventInputDto;
 import ru.practicum.stats.dto.EventOutputDto;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,25 +18,23 @@ public class StatsServerServiceImpl implements StatsServerService {
     private final StatsServerRepository repository;
 
     @Override
-    public EventOutputDto hit(EventInputDto eventInputDto) {
+    public Event hit(EventInputDto eventInputDto) {
         Event event = EventMapper.toEvent(eventInputDto);
         Event newEvent = repository.save(event);
-        return EventMapper.toEventOutputDto(newEvent);
+        return newEvent;
     }
 
     @Override
     public List<EventOutputDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
-        List<Event> events;
+        List<EventOutputDto> events;
 
         if (uris == null || uris.isEmpty())
-            events = repository.findByEventCreatedBetween(start, end);
+            events = repository.getEvents(start, end);
         else
-            events = repository.findByEventCreatedBetweenAndUriIn(start, end, uris);
+            events = repository.getEventsByUris(start, end, uris);
 
-        var ipSet = new HashSet<>();
-        if (unique)
-            return events.stream().filter(e -> ipSet.add(e.getIp())).map(EventMapper::toEventOutputDto)
-                    .collect(Collectors.toList());
-        return events.stream().map(EventMapper::toEventOutputDto).collect(Collectors.toList());
+        events = events.stream().sorted(Comparator.comparingLong(EventOutputDto::getHits)).collect(Collectors.toList());
+        events.sort(Collections.reverseOrder(Comparator.comparingLong(EventOutputDto::getHits)));
+        return events;
     }
 }

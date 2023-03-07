@@ -1,11 +1,24 @@
 package ru.practicum.stats.dto;
 
-import java.time.LocalDateTime;
-
 public class EventOutputDto {
+
+    public EventOutputDto(Long hits, String app, String uri) {
+        this.app = app;
+        this.uri = uri;
+        this.hits = hits;
+    }
+
     private String app;
     private String uri;
-    private LocalDateTime eventCreated;
+    private Long hits;
+
+    public Long getHits() {
+        return hits;
+    }
+
+    public void setHits(Long hits) {
+        this.hits = hits;
+    }
 
     public String getApp() {
         return app;
@@ -23,11 +36,4 @@ public class EventOutputDto {
         this.uri = uri;
     }
 
-    public LocalDateTime getEventCreated() {
-        return eventCreated;
-    }
-
-    public void setEventCreated(LocalDateTime eventCreated) {
-        this.eventCreated = eventCreated;
-    }
 }
