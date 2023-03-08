@@ -18,7 +18,7 @@ public class StatsServerController {
 
     private final StatsServerService service;
 
-    private final static String datePattern = "yyyy-MM-dd HH:mm:ss";
+    private static final String datePattern = "yyyy-MM-dd HH:mm:ss";
 
     @PostMapping("/hit")
     public Event hit(@RequestBody EventInputDto eventInputDto) {
