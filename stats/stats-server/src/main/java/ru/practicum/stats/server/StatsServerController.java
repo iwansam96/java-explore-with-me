@@ -18,6 +18,8 @@ public class StatsServerController {
 
     private final StatsServerService service;
 
+    private final static String datePattern = "yyyy-MM-dd HH:mm:ss";
+
     @PostMapping("/hit")
     public Event hit(@RequestBody EventInputDto eventInputDto) {
         log.info("POST /hit");
@@ -25,8 +27,8 @@ public class StatsServerController {
     }
 
     @GetMapping("/stats")
-    public List<EventOutputDto> getStats(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
-                                        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
+    public List<EventOutputDto> getStats(@RequestParam @DateTimeFormat(pattern = datePattern) LocalDateTime start,
+                                        @RequestParam @DateTimeFormat(pattern = datePattern) LocalDateTime end,
                                         @RequestParam(required = false) List<String> uris,
                                         @RequestParam(defaultValue = "false") Boolean unique) {
         log.info("GET /event/, start=" + start + ", end=" + end + ", uris=" + uris + ", unique=" + unique);
