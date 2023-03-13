@@ -1,9 +1,15 @@
 package ru.practicum.mainservice.models;
 
+import lombok.Data;
+
+import javax.persistence.Embeddable;
+
+@Embeddable
+@Data
 public class Location {
 //    Широта
-    Float lat;
+    private Float lat;
 
 //    Долгота
-    Float lon;
+    private Float lon;
 }

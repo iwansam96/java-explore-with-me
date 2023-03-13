@@ -1,5 +1,9 @@
 package ru.practicum.mainservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import lombok.Data;
 import ru.practicum.mainservice.models.Category;
 import ru.practicum.mainservice.models.EventState;
 import ru.practicum.mainservice.models.Location;
@@ -7,6 +11,7 @@ import ru.practicum.mainservice.models.User;
 
 import java.time.LocalDateTime;
 
+@Data
 public class EventFullDto {
 
     //    Краткое описание
@@ -38,6 +43,8 @@ public class EventFullDto {
     Long participantLimit;
 
     //    Дата и время публикации события (в формате "yyyy-MM-dd HH:mm:ss")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime publishedOn;
 
     //    Нужна ли пре-модерация заявок на участие
