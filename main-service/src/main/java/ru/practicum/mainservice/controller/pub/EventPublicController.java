@@ -8,6 +8,7 @@ import ru.practicum.mainservice.dto.EventShortDto;
 import ru.practicum.mainservice.models.EventSort;
 import ru.practicum.mainservice.service.EventService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -30,14 +31,19 @@ public class EventPublicController {
                                         @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                         @RequestParam EventSort sort,
                                         @RequestParam(defaultValue = "0") Integer from,
-                                        @RequestParam(defaultValue = "10") Integer size) {
+                                        @RequestParam(defaultValue = "10") Integer size,
+                                        HttpServletRequest request) {
         log.info("GET /events");
-        return eventService.getShort(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+        String ip = request.getRemoteAddr();
+        String uri = request.getRequestURI();
+        return eventService.getShort(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, ip, uri);
     }
 
     @GetMapping("/{eventId}")
-    public EventFullDto getFull(@Valid @NotNull @PathVariable Long eventId) {
+    public EventFullDto getFull(@Valid @NotNull @PathVariable Long eventId, HttpServletRequest request) {
         log.info("GET /events/{}", eventId);
-        return eventService.getById(eventId);
+        String ip = request.getRemoteAddr();
+        String uri = request.getRequestURI();
+        return eventService.getById(eventId, ip, uri);
     }
 }

@@ -5,8 +5,19 @@ import ru.practicum.mainservice.models.Category;
 import ru.practicum.mainservice.models.Event;
 import ru.practicum.mainservice.models.ParticipationRequestStatus;
 import ru.practicum.mainservice.models.User;
+import ru.practicum.stats.dto.EventInputDto;
+
+import java.time.LocalDateTime;
 
 public class EventMapper {
+    public static EventInputDto toEventInputDto(EventShortDto eventShortDto, String ip, String uri, String app) {
+        EventInputDto eventInputDto = new EventInputDto();
+        eventInputDto.setEventCreated(LocalDateTime.now());
+        eventInputDto.setApp(app);
+        eventInputDto.setIp(ip);
+        eventInputDto.setUri(uri);
+        return eventInputDto;
+    }
 
     public static EventShortDto toEventShortDto(Event event, Long views) {
         EventShortDto eventShortDto = new EventShortDto();

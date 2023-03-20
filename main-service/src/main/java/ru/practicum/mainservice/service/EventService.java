@@ -13,8 +13,11 @@ import ru.practicum.mainservice.models.*;
 import ru.practicum.mainservice.repository.CategoryRepository;
 import ru.practicum.mainservice.repository.EventRepository;
 import ru.practicum.mainservice.repository.UserRepository;
+import ru.practicum.stats.client.EventClient;
+import ru.practicum.stats.dto.EventInputDto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,9 +30,11 @@ public class EventService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
 
+    private final EventClient eventClient;
+
     public List<EventShortDto> getShort(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart,
                                         LocalDateTime rangeEnd, Boolean onlyAvailable, EventSort sort, Integer from,
-                                        Integer size) {
+                                        Integer size, String ip, String uri) {
         int page = from / size;
         PageRequest pageRequest = PageRequest.of(page, size);
 
@@ -84,11 +89,25 @@ public class EventService {
                     .filter(e -> e.getParticipantLimit() < e.getRequests().size())
                     .collect(Collectors.toList());
 
-        var eventsDto = events.stream()
-                .map(event -> EventMapper.toEventShortDto(
-                        event,
-                        0L))
-                .collect(Collectors.toList());
+//        var eventsDto = events.stream()
+//                .map(event -> EventMapper.toEventShortDto(
+//                        event,
+//                        0L))
+//                .collect(Collectors.toList());
+
+
+
+        List<EventShortDto> eventsDto = new ArrayList<>();
+//        сохранение всех запрошенных событий в сервис статистики
+        for (var event : events) {
+            var stat = eventClient.getStats(event.getCreatedOn(), LocalDateTime.now(), List.of(uri), false);
+            Long hits = 0L;
+            if (stat != null && !stat.isEmpty()) {
+                hits = stat.get(0).getHits();
+            }
+            eventsDto.add(EventMapper.toEventShortDto(event, hits));
+            eventClient.addStat(new EventInputDto(ip, uri+"/"+event.getId(), "ewm-main"));
+        }
 
         if (sort != null && sort.equals(EventSort.EVENT_DATE))
             eventsDto = eventsDto.stream().sorted(Comparator.comparing(EventShortDto::getEventDate)).collect(Collectors.toList());
@@ -97,6 +116,26 @@ public class EventService {
 
         return eventsDto;
     }
+
+    public EventFullDto getById(Long eventId, String ip, String uri) {
+        Event event = eventRepository.findById(eventId).orElse(null);
+
+        if (event == null || !event.getState().equals(EventState.PUBLISHED))
+            throw new EntityNotFoundException("event " + eventId + " not found");
+
+        eventClient.addStat(new EventInputDto(ip, uri, "ewm-main"));
+
+        var stat = eventClient.getStats(event.getCreatedOn(), LocalDateTime.now(), List.of(uri), false);
+        Long hits = 0L;
+        if (stat != null && !stat.isEmpty())
+            hits = stat.get(0).getHits();
+
+        return EventMapper.toEventFullDto(
+                event,
+                hits
+        );
+    }
+
 
     public List<EventShortDto> getShort(Long userId, Integer from, Integer size) {
         int page = from / size;
@@ -165,19 +204,6 @@ public class EventService {
                         event,
                         0L))
                 .collect(Collectors.toList());
-    }
-
-
-    public EventFullDto getById(Long eventId) {
-        Event event = eventRepository.findById(eventId).orElse(null);
-
-        if (event == null || !event.getState().equals(EventState.PUBLISHED))
-            throw new EntityNotFoundException("event " + eventId + " not found");
-
-        return EventMapper.toEventFullDto(
-                event,
-                0L
-        );
     }
 
     public EventFullDto getById(Long userId, Long eventId) {
