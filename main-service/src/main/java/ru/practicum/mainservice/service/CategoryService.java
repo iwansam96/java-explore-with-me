@@ -1,6 +1,7 @@
 package ru.practicum.mainservice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.mainservice.dto.CategoryDto;
 import ru.practicum.mainservice.dto.NewCategoryDto;
@@ -18,8 +19,11 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    public List<CategoryDto> getAll() {
-        var categories = categoryRepository.findAll();
+    public List<CategoryDto> getAll(Integer from, Integer size) {
+        int page = from / size;
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        var categories = categoryRepository.findAll(pageRequest).toList();
         return categories.stream()
                 .map(CategoryMapper::toCategoryDto)
                 .collect(Collectors.toList());

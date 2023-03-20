@@ -16,4 +16,48 @@ public class BusinessExceptionHandler {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler({ InvalidEventParametersException.class })
+    public ResponseEntity<Object> handleNewEventDateException(InvalidEventParametersException e) {
+        log.error(e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler({ EventChangeNotAllowedException.class })
+    public ResponseEntity<Object> handleEventChangeNotAllowedException(EventChangeNotAllowedException e) {
+        log.error(e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler({ ParticipationRequestsLimitException.class })
+    public ResponseEntity<Object> handleParticipationRequestsLimitException(ParticipationRequestsLimitException e) {
+        log.error(e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler({ EventWithWrongStateException.class })
+    public ResponseEntity<Object> handleEventWithWrongStateException(EventWithWrongStateException e) {
+        log.error(e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler({ ParticipationRequestsChangeStatusException.class })
+    public ResponseEntity<Object> handleParticipationRequestsChangeStatusException(
+            ParticipationRequestsChangeStatusException e
+    ) {
+        log.error(e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({ ParticipationRequestsDuplicateException.class })
+    public ResponseEntity<Object> handleParticipationRequestsDuplicateException(ParticipationRequestsDuplicateException e) {
+        log.error(e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler({ ParticipationRequestsAddNotAllowedException.class })
+    public ResponseEntity<Object> handleParticipationRequestsAddNotAllowedException(ParticipationRequestsAddNotAllowedException e) {
+        log.error(e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+    }
+
 }

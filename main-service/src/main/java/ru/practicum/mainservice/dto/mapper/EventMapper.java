@@ -3,6 +3,7 @@ package ru.practicum.mainservice.dto.mapper;
 import ru.practicum.mainservice.dto.*;
 import ru.practicum.mainservice.models.Category;
 import ru.practicum.mainservice.models.Event;
+import ru.practicum.mainservice.models.ParticipationRequestStatus;
 import ru.practicum.mainservice.models.User;
 
 public class EventMapper {
@@ -11,7 +12,11 @@ public class EventMapper {
         EventShortDto eventShortDto = new EventShortDto();
         eventShortDto.setAnnotation(event.getAnnotation());
         eventShortDto.setCategory(event.getCategory());
-        eventShortDto.setConfirmedRequests((long) event.getRequests().size());
+        eventShortDto.setConfirmedRequests(
+                event.getRequests().stream()
+                .filter(r->r.getStatus().equals(ParticipationRequestStatus.CONFIRMED))
+                .count()
+        );
         eventShortDto.setEventDate(event.getEventDate());
         eventShortDto.setId(event.getId());
         eventShortDto.setInitiator(event.getInitiator());

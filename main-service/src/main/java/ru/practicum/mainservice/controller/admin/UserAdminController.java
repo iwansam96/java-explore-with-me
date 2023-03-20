@@ -19,9 +19,11 @@ public class UserAdminController {
     private final UserService userService;
 
     @GetMapping
-    public List<UserDto> get() {
+    public List<UserDto> get(@RequestParam List<Long> users,
+                             @RequestParam(defaultValue = "0") Integer from,
+                             @RequestParam(defaultValue = "10") Integer size) {
         log.info("GET all users");
-        return userService.get();
+        return userService.get(users, from, size);
     }
 
     @PostMapping

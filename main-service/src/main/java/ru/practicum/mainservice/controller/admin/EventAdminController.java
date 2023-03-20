@@ -9,6 +9,7 @@ import ru.practicum.mainservice.service.EventService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -19,9 +20,15 @@ public class EventAdminController {
     private final EventService eventService;
 
     @GetMapping
-    public List<EventFullDto> getFull() {
+    public List<EventFullDto> getFull(@RequestParam List<Long> users,
+                                      @RequestParam List<String> states,
+                                      @RequestParam List<Long> categories,
+                                      @RequestParam LocalDateTime rangeStart,
+                                      @RequestParam LocalDateTime rangeEnd,
+                                      @RequestParam(defaultValue = "0") Integer from,
+                                      @RequestParam(defaultValue = "10") Integer size) {
         log.info("GET /admin/events");
-        return eventService.getFull();
+        return eventService.getFull(users, states, categories, rangeStart, rangeEnd, from, size);
     }
 
     @PatchMapping("/{eventId}")
