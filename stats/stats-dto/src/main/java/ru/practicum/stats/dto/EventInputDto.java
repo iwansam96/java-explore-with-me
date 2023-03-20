@@ -8,7 +8,10 @@ public class EventInputDto {
     private String ip;
     private LocalDateTime eventCreated;
 
-    public EventInputDto() {}
+    public EventInputDto() {
+
+    }
+
     public EventInputDto(String app, String uri, String ip) {
         this.ip = ip;
         this.app = app;
