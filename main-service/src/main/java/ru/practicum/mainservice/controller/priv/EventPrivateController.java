@@ -7,6 +7,7 @@ import ru.practicum.mainservice.dto.*;
 import ru.practicum.mainservice.service.EventService;
 import ru.practicum.mainservice.service.ParticipationRequestService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -29,25 +30,31 @@ public class EventPrivateController {
 
     @PostMapping
     public EventFullDto save(@Valid @NotNull @PathVariable Long userId,
-                             @Valid @NotNull @RequestBody NewEventDto newEventDto) {
+                             @Valid @NotNull @RequestBody NewEventDto newEventDto,
+                             HttpServletRequest request) {
         log.info("POST /users/{}/events", userId);
-        return eventService.save(userId, newEventDto);
+        String uri = request.getRequestURI();
+        return eventService.save(userId, newEventDto, uri);
     }
 
 
     @GetMapping("/{eventId}")
     public EventFullDto getFull(@Valid @NotNull @PathVariable Long userId,
-                                @Valid @NotNull @PathVariable Long eventId) {
+                                @Valid @NotNull @PathVariable Long eventId,
+                                HttpServletRequest request) {
         log.info("GET /users/" + userId + "/events/" + eventId);
-        return eventService.getById(userId, eventId);
+        String uri = request.getRequestURI();
+        return eventService.getById(userId, eventId, uri);
     }
 
     @PatchMapping("/{eventId}")
     public EventFullDto update(@Valid @NotNull @PathVariable Long userId,
                                @Valid @NotNull @PathVariable Long eventId,
-                               @Valid @NotNull @RequestBody UpdateEventUserRequest updateEventUserRequest) {
+                               @Valid @NotNull @RequestBody UpdateEventUserRequest updateEventUserRequest,
+                               HttpServletRequest request) {
         log.info("PATCH /users/" + userId + "/events/" + eventId);
-        return eventService.update(userId, eventId, updateEventUserRequest);
+        String uri = request.getRequestURI();
+        return eventService.update(userId, eventId, updateEventUserRequest, uri);
     }
 
 

@@ -7,6 +7,7 @@ import ru.practicum.mainservice.dto.CategoryDto;
 import ru.practicum.mainservice.dto.NewCategoryDto;
 import ru.practicum.mainservice.dto.mapper.CategoryMapper;
 import ru.practicum.mainservice.exception.EntityNotFoundException;
+import ru.practicum.mainservice.exception.IncorrectDataException;
 import ru.practicum.mainservice.models.Category;
 import ru.practicum.mainservice.repository.CategoryRepository;
 
@@ -37,12 +38,18 @@ public class CategoryService {
     }
 
     public CategoryDto save(NewCategoryDto categoryDto) {
+        if (categoryDto == null || categoryDto.getName() == null || categoryDto.getName().isBlank())
+            throw new IncorrectDataException("incorrect category data");
+
         Category category = CategoryMapper.toCategory(categoryDto);
         Category newCategory = categoryRepository.save(category);
         return CategoryMapper.toCategoryDto(newCategory);
     }
 
     public CategoryDto save(NewCategoryDto categoryDto, Long catId) {
+        if (categoryDto == null || categoryDto.getName() == null || categoryDto.getName().isBlank())
+            throw new IncorrectDataException("incorrect category data");
+
         Category category = CategoryMapper.toCategory(categoryDto);
         category.setId(catId);
         Category newCategory = categoryRepository.save(category);

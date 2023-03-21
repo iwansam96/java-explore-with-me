@@ -1,5 +1,7 @@
 package ru.practicum.mainservice.controller.pub;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -23,16 +25,17 @@ public class EventPublicController {
     private final EventService eventService;
 
     @GetMapping
-    public List<EventShortDto> getShort(@RequestParam String text,
-                                        @RequestParam List<Long> categories,
-                                        @RequestParam Boolean paid,
-                                        @RequestParam LocalDateTime rangeStart,
-                                        @RequestParam LocalDateTime rangeEnd,
-                                        @RequestParam(defaultValue = "false") Boolean onlyAvailable,
-                                        @RequestParam EventSort sort,
-                                        @RequestParam(defaultValue = "0") Integer from,
-                                        @RequestParam(defaultValue = "10") Integer size,
-                                        HttpServletRequest request) {
+    public List<EventShortDto> getShort(
+            @RequestParam(required = false) String text,
+            @RequestParam(required = false) List<Long> categories,
+            @RequestParam(required = false) Boolean paid,
+            @RequestParam(required = false) @JsonSerialize(using = LocalDateTimeSerializer.class) LocalDateTime rangeStart,
+            @RequestParam(required = false) @JsonSerialize(using = LocalDateTimeSerializer.class) LocalDateTime rangeEnd,
+            @RequestParam(defaultValue = "false") Boolean onlyAvailable,
+            @RequestParam(required = false) EventSort sort,
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size,
+            HttpServletRequest request) {
         log.info("GET /events");
         String ip = request.getRemoteAddr();
         String uri = request.getRequestURI();

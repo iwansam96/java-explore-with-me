@@ -11,10 +11,13 @@ import ru.practicum.stats.dto.EventInputDto;
 import ru.practicum.stats.dto.EventOutputDto;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
 public class EventClient extends BaseClient {
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Autowired
     public EventClient(@Value("${stats-server.url}") String serverUrl, RestTemplateBuilder builder) {
@@ -31,10 +34,11 @@ public class EventClient extends BaseClient {
 
     public List<EventOutputDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         StringBuilder pathBuilder = new StringBuilder();
+        pathBuilder.append("/stats");
         pathBuilder.append("?start=");
-        pathBuilder.append(start);
+        pathBuilder.append(start.format(formatter));
         pathBuilder.append("&end=");
-        pathBuilder.append(end);
+        pathBuilder.append(end.format(formatter));
         pathBuilder.append("&unique=");
         pathBuilder.append(unique);
         if (uris != null && !uris.isEmpty()) {
@@ -44,6 +48,8 @@ public class EventClient extends BaseClient {
             }
         }
 
-        return (List<EventOutputDto>) get("/stats", null).getBody();
+//        System.out.println("@@@@@@@@@@@@@"+pathBuilder);
+//        List<EventOutputDto> a = (List<EventOutputDto>) get(pathBuilder.toString(), null).getBody();
+        return (List<EventOutputDto>) get(pathBuilder.toString(), null).getBody();
     }
 }

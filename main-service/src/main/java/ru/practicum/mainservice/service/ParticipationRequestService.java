@@ -58,10 +58,12 @@ public class ParticipationRequestService {
             throw new ParticipationRequestsLimitException("The participant limit has been reached");
         }
 
-        boolean isLimitEqualZero = requests.get(0).getEvent().getParticipantLimit() == 0;
-        boolean isEnablePreModeration = requests.get(0).getEvent().getRequestModeration();
-        if (!requests.isEmpty() && (isLimitEqualZero || isEnablePreModeration) )
-            return new EventRequestStatusUpdateResult();
+        if (!requests.isEmpty()) {
+            boolean isLimitEqualZero = requests.get(0).getEvent().getParticipantLimit() == 0;
+            boolean isEnablePreModeration = requests.get(0).getEvent().getRequestModeration();
+            if (isLimitEqualZero || isEnablePreModeration)
+                return new EventRequestStatusUpdateResult();
+        }
 
 
         List<ParticipationRequest> updatedRequests = new ArrayList<>();

@@ -19,21 +19,21 @@ public class CategoryAdminController {
     private final CategoryService categoryService;
 
     @PostMapping
-    public CategoryDto save(@Valid @NotNull @RequestBody NewCategoryDto categoryDto) {
-        log.info("POST user");
+    public CategoryDto save(@RequestBody NewCategoryDto categoryDto) {
+        log.info("POST category");
         return categoryService.save(categoryDto);
     }
 
     @DeleteMapping("/{catId}")
     public void delete(@Valid @NotNull @PathVariable Long catId) {
-        log.info("DELETE user {}", catId);
+        log.info("DELETE category {}", catId);
         categoryService.delete(catId);
     }
 
     @PatchMapping("/{catId}")
-    public CategoryDto update(@Valid @NotNull @RequestBody NewCategoryDto categoryDto,
+    public CategoryDto update(@RequestBody NewCategoryDto categoryDto,
                                          @Valid @NotNull @PathVariable Long catId) {
-        log.info("PATCH user {}", catId);
+        log.info("PATCH category {}; new category: " + categoryDto, catId);
         return categoryService.save(categoryDto, catId);
     }
 }

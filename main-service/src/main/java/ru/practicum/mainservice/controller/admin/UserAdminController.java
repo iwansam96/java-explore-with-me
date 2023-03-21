@@ -19,7 +19,7 @@ public class UserAdminController {
     private final UserService userService;
 
     @GetMapping
-    public List<UserDto> get(@RequestParam List<Long> users,
+    public List<UserDto> get(@RequestParam(required = false) List<Long> users,
                              @RequestParam(defaultValue = "0") Integer from,
                              @RequestParam(defaultValue = "10") Integer size) {
         log.info("GET all users");

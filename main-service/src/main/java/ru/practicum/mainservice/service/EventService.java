@@ -89,13 +89,6 @@ public class EventService {
                     .filter(e -> e.getParticipantLimit() < e.getRequests().size())
                     .collect(Collectors.toList());
 
-//        var eventsDto = events.stream()
-//                .map(event -> EventMapper.toEventShortDto(
-//                        event,
-//                        0L))
-//                .collect(Collectors.toList());
-
-
 
         List<EventShortDto> eventsDto = new ArrayList<>();
 //        сохранение всех запрошенных событий в сервис статистики
@@ -103,6 +96,7 @@ public class EventService {
             var stat = eventClient.getStats(event.getCreatedOn(), LocalDateTime.now(), List.of(uri), false);
             Long hits = 0L;
             if (stat != null && !stat.isEmpty()) {
+                System.out.println(stat.get(0));
                 hits = stat.get(0).getHits();
             }
             eventsDto.add(EventMapper.toEventShortDto(event, hits));
@@ -125,10 +119,7 @@ public class EventService {
 
         eventClient.addStat(new EventInputDto(ip, uri, "ewm-main"));
 
-        var stat = eventClient.getStats(event.getCreatedOn(), LocalDateTime.now(), List.of(uri), false);
-        Long hits = 0L;
-        if (stat != null && !stat.isEmpty())
-            hits = stat.get(0).getHits();
+        Long hits = getEventHits(uri, event);
 
         return EventMapper.toEventFullDto(
                 event,
@@ -206,7 +197,7 @@ public class EventService {
                 .collect(Collectors.toList());
     }
 
-    public EventFullDto getById(Long userId, Long eventId) {
+    public EventFullDto getById(Long userId, Long eventId, String uri) {
         Event event = eventRepository.findEventByIdAndInitiator_Id(eventId, userId);
 
         if (event == null)
@@ -214,12 +205,12 @@ public class EventService {
 
         return EventMapper.toEventFullDto(
                 event,
-                0L
+                getEventHits(uri, event)
         );
     }
 
 
-    public EventFullDto save(Long userId, NewEventDto newEventDto) {
+    public EventFullDto save(Long userId, NewEventDto newEventDto, String uri) {
         if (newEventDto.getEventDate().isBefore(LocalDateTime.now().minusHours(2)))
             throw new InvalidEventParametersException("Дата и время на которые намечено событие не может быть раньше, " +
                     "чем через два часа от текущего момента");
@@ -237,17 +228,22 @@ public class EventService {
 
         Event savedEvent = eventRepository.save(newEvent);
 
-        return EventMapper.toEventFullDto(savedEvent,  0L);
+        return EventMapper.toEventFullDto(savedEvent,  getEventHits(uri, savedEvent));
     }
 
-    public EventFullDto update(Long eventId, UpdateEventAdminRequest updatedEvent) {
-        if (updatedEvent.getEventDate().isBefore(LocalDateTime.now().minusHours(1)))
-            throw new InvalidEventParametersException("Дата и время на которые намечено событие не может быть раньше, " +
-                    "чем через час от текущего момента");
-
+    public EventFullDto update(Long eventId, UpdateEventAdminRequest updatedEvent, String uri) {
         Event eventToUpdate = eventRepository.findById(eventId).orElse(null);
         if (eventToUpdate == null)
             throw new EntityNotFoundException("event " + eventId + " not found");
+
+        if (updatedEvent == null || updatedEvent.getEventDate() == null || updatedEvent.getStateAction() == null)
+            return EventMapper.toEventFullDto(eventToUpdate, getEventHits(uri, eventToUpdate));
+
+        if (updatedEvent.getEventDate().isBefore(LocalDateTime.now().minusHours(1))) {
+            throw new InvalidEventParametersException("Дата и время на которые намечено событие не может быть раньше, " +
+                    "чем через час от текущего момента");
+        }
+
 
         if (updatedEvent.getStateAction().equals(EventStateAction.PUBLISH_EVENT) &&
                 eventToUpdate.getState().equals(EventState.PENDING))
@@ -270,17 +266,22 @@ public class EventService {
 
         Event savedEvent = eventRepository.save(eventToUpdate);
 
-        return EventMapper.toEventFullDto(savedEvent, 0L);
+        return EventMapper.toEventFullDto(savedEvent, getEventHits(uri, savedEvent));
     }
 
-    public EventFullDto update(Long userId, Long eventId, UpdateEventUserRequest updatedEvent) {
-        if (updatedEvent.getEventDate().isBefore(LocalDateTime.now().minusHours(2)))
-            throw new InvalidEventParametersException("Дата и время на которые намечено событие не может быть раньше, " +
-                    "чем через два часа от текущего момента");
-
+    public EventFullDto update(Long userId, Long eventId, UpdateEventUserRequest updatedEvent, String uri) {
         Event eventToUpdate = eventRepository.findEventByIdAndInitiator_Id(eventId, userId);
         if (eventToUpdate == null)
             throw new EntityNotFoundException("event " + eventId + " not found");
+
+        if (updatedEvent == null || updatedEvent.getEventDate() == null || updatedEvent.getStateAction() == null)
+            return EventMapper.toEventFullDto(eventToUpdate, getEventHits(uri, eventToUpdate));
+
+        if (updatedEvent.getEventDate().isBefore(LocalDateTime.now().minusHours(2))) {
+            throw new InvalidEventParametersException("Дата и время на которые намечено событие не может быть раньше, " +
+                    "чем через два часа от текущего момента");
+        }
+
 
         boolean isEventCanceled = eventToUpdate.getState().equals(EventState.CANCELED);
         boolean isEventPending = eventToUpdate.getState().equals(EventState.PENDING);
@@ -306,6 +307,15 @@ public class EventService {
 
         Event savedEvent = eventRepository.save(eventToUpdate);
 
-        return EventMapper.toEventFullDto(savedEvent,  0L);
+        return EventMapper.toEventFullDto(savedEvent,  getEventHits(uri, savedEvent));
+    }
+
+
+    private Long getEventHits(String uri, Event event) {
+        var stat = eventClient.getStats(event.getCreatedOn(), LocalDateTime.now(), List.of(uri), false);
+        Long hits = 0L;
+        if (stat != null && !stat.isEmpty())
+            hits = stat.get(0).getHits();
+        return hits;
     }
 }

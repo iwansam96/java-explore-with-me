@@ -1,5 +1,8 @@
 package ru.practicum.mainservice.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -27,7 +30,7 @@ public class Event {
 
     //    Краткое описание
     @NotBlank
-    @Column(name = "event_annotation")
+    @Column(name = "event_annotation", length = 2000)
     private String annotation;
 
     @NotNull
@@ -38,16 +41,20 @@ public class Event {
     //    Дата и время создания события (в формате "yyyy-MM-dd HH:mm:ss")
     @CreationTimestamp
     @Column(name = "event_created_on")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdOn;
 
     //    Полное описание события
     @NotBlank
-    @Column(name = "event_description")
+    @Column(name = "event_description", length = 7000)
     private String description;
 
     //    Дата и время на которые намечено событие (в формате "yyyy-MM-dd HH:mm:ss")
     @NotNull
     @Column(name = "event_date")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
     @NotNull
@@ -71,6 +78,8 @@ public class Event {
 
 //    Дата и время публикации события (в формате "yyyy-MM-dd HH:mm:ss")
     @Column(name = "event_published")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime publishedOn;
 
 //    Нужна ли пре-модерация заявок на участие
@@ -83,7 +92,7 @@ public class Event {
     private EventState state;
 
     @NotBlank
-    @Column(name = "event_title")
+    @Column(name = "event_title", length = 120)
     private String title;
 
     @ManyToMany

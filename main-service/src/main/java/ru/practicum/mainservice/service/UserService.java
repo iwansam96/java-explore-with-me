@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.mainservice.dto.UserDto;
 import ru.practicum.mainservice.dto.mapper.UserMapper;
 import ru.practicum.mainservice.exception.EntityNotFoundException;
+import ru.practicum.mainservice.exception.IncorrectDataException;
 import ru.practicum.mainservice.models.User;
 import ru.practicum.mainservice.repository.UserRepository;
 
@@ -33,6 +34,9 @@ public class UserService {
     }
 
     public UserDto save(UserDto userDto) {
+        if (userDto == null || userDto.getName() == null || userDto.getName().isBlank() ||
+                userDto.getEmail() == null || userDto.getEmail().isBlank())
+            throw new IncorrectDataException("incorrect user data");
         User user = UserMapper.toUser(userDto);
         User newUser = userRepository.save(user);
         return UserMapper.toUserDto(newUser);
