@@ -28,6 +28,7 @@ public class ParticipationRequestPrivateController {
     public ParticipationRequestDto save(@Valid @NotNull @PathVariable Long userId,
                                         @Valid @NotNull @RequestParam Long eventId) {
         log.info("POST /users/" + userId + "/requests?eventId=" + eventId);
+        System.out.println("@@@@@@@@@@@@@@ "+eventId);
         return participationRequestService.save(userId, eventId);
     }
 

@@ -48,8 +48,6 @@ public class EventClient extends BaseClient {
             }
         }
 
-//        System.out.println("@@@@@@@@@@@@@"+pathBuilder);
-//        List<EventOutputDto> a = (List<EventOutputDto>) get(pathBuilder.toString(), null).getBody();
         return (List<EventOutputDto>) get(pathBuilder.toString(), null).getBody();
     }
 }

@@ -96,7 +96,6 @@ public class EventService {
             var stat = eventClient.getStats(event.getCreatedOn(), LocalDateTime.now(), List.of(uri), false);
             Long hits = 0L;
             if (stat != null && !stat.isEmpty()) {
-                System.out.println(stat.get(0));
                 hits = stat.get(0).getHits();
             }
             eventsDto.add(EventMapper.toEventShortDto(event, hits));
@@ -128,7 +127,7 @@ public class EventService {
     }
 
 
-    public List<EventShortDto> getShort(Long userId, Integer from, Integer size) {
+    public List<EventShortDto> getShort(Long userId, Integer from, Integer size, String uri) {
         int page = from / size;
         PageRequest pageRequest = PageRequest.of(page, size);
 
@@ -137,12 +136,13 @@ public class EventService {
         return events.stream()
                 .map(event -> EventMapper.toEventShortDto(
                         event,
-                        0L))
+                        getEventHits(uri, event)))
                 .collect(Collectors.toList());
     }
 
     public List<EventFullDto> getFull(List<Long> users, List<String> states, List<Long> categories,
-                                      LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size) {
+                                      LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size,
+                                      String uri) {
         int page = from / size;
         PageRequest pageRequest = PageRequest.of(page, size);
 
@@ -193,7 +193,7 @@ public class EventService {
         return events.stream()
                 .map(event -> EventMapper.toEventFullDto(
                         event,
-                        0L))
+                        getEventHits(uri, event)))
                 .collect(Collectors.toList());
     }
 
@@ -211,7 +211,7 @@ public class EventService {
 
 
     public EventFullDto save(Long userId, NewEventDto newEventDto, String uri) {
-        if (newEventDto.getEventDate().isBefore(LocalDateTime.now().minusHours(2)))
+        if (LocalDateTime.now().plusHours(2).isAfter(newEventDto.getEventDate()))
             throw new InvalidEventParametersException("Дата и время на которые намечено событие не может быть раньше, " +
                     "чем через два часа от текущего момента");
 
@@ -233,16 +233,28 @@ public class EventService {
 
     public EventFullDto update(Long eventId, UpdateEventAdminRequest updatedEvent, String uri) {
         Event eventToUpdate = eventRepository.findById(eventId).orElse(null);
-        if (eventToUpdate == null)
+        if (eventToUpdate == null) {
             throw new EntityNotFoundException("event " + eventId + " not found");
+        }
 
-        if (updatedEvent == null || updatedEvent.getEventDate() == null || updatedEvent.getStateAction() == null)
+        if (updatedEvent == null || updatedEvent.getEventDate() == null)
             return EventMapper.toEventFullDto(eventToUpdate, getEventHits(uri, eventToUpdate));
 
-        if (updatedEvent.getEventDate().isBefore(LocalDateTime.now().minusHours(1))) {
+        if (LocalDateTime.now().plusHours(1).isAfter(updatedEvent.getEventDate())) {
             throw new InvalidEventParametersException("Дата и время на которые намечено событие не может быть раньше, " +
                     "чем через час от текущего момента");
         }
+
+        if (EventState.PUBLISHED.equals(eventToUpdate.getState()) || EventState.CANCELED.equals(eventToUpdate.getState())) {
+            throw new InvalidEventParametersException("event is already published on canceled");
+        }
+
+        if (EventState.PUBLISHED.equals(eventToUpdate.getState()) &&
+                EventStateAction.REJECT_EVENT.equals(updatedEvent.getStateAction())) {
+            throw new InvalidEventParametersException("cannot cancel already published event");
+        }
+
+
 
 
         if (updatedEvent.getStateAction().equals(EventStateAction.PUBLISH_EVENT) &&

@@ -23,9 +23,11 @@ public class EventPrivateController {
     @GetMapping
     public List<EventShortDto> getFull(@Valid @NotNull @PathVariable Long userId,
                                        @RequestParam(defaultValue = "0") Integer from,
-                                       @RequestParam(defaultValue = "10") Integer size) {
+                                       @RequestParam(defaultValue = "10") Integer size,
+                                       HttpServletRequest request) {
         log.info("GET /users/{}/events", userId);
-        return eventService.getShort(userId, from, size);
+        String uri = request.getRequestURI();
+        return eventService.getShort(userId, from, size, uri);
     }
 
     @PostMapping

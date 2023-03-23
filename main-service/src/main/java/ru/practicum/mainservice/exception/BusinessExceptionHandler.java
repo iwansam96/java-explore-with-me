@@ -66,4 +66,16 @@ public class BusinessExceptionHandler {
         return new ResponseEntity<>("{\"status\": \""+e.getMessage()+"\"}", HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler({ DublicateNameException.class })
+    public ResponseEntity<Object> handleDublicateNameException(DublicateNameException e) {
+        log.error(e.getMessage());
+        return new ResponseEntity<>("{\"status\": \""+e.getMessage()+"\"}", HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler({ CategoryIsInUseException.class })
+    public ResponseEntity<Object> handleCategoryIsInUseException(CategoryIsInUseException e) {
+        log.error(e.getMessage());
+        return new ResponseEntity<>("{\"status\": \""+e.getMessage()+"\"}", HttpStatus.CONFLICT);
+    }
+
 }

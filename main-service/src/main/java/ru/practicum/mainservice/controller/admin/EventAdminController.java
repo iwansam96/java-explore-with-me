@@ -29,9 +29,11 @@ public class EventAdminController {
                                       @RequestParam(required = false) @JsonSerialize(using = LocalDateTimeSerializer.class) LocalDateTime rangeStart,
                                       @RequestParam(required = false) @JsonSerialize(using = LocalDateTimeSerializer.class) LocalDateTime rangeEnd,
                                       @RequestParam(defaultValue = "0") Integer from,
-                                      @RequestParam(defaultValue = "10") Integer size) {
+                                      @RequestParam(defaultValue = "10") Integer size,
+                                      HttpServletRequest request) {
         log.info("GET /admin/events");
-        return eventService.getFull(users, states, categories, rangeStart, rangeEnd, from, size);
+        String uri = request.getRequestURI();
+        return eventService.getFull(users, states, categories, rangeStart, rangeEnd, from, size, uri);
     }
 
     @PatchMapping("/{eventId}")

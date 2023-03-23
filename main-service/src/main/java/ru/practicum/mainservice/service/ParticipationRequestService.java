@@ -47,9 +47,12 @@ public class ParticipationRequestService {
             throw new EntityNotFoundException("event " + eventId + " not found");
         }
 
+        System.out.println("@@@@0: "+updateRequest.getRequestIds());
         List<ParticipationRequest> requests =
-                participationRequestRepository.findAllByIdInAndEventIdAndEvent_Initiator_Id(
-                        updateRequest.getRequestIds(), eventId, userId);
+                participationRequestRepository.findAllByIdIn(
+                        updateRequest.getRequestIds());
+        System.out.println("@@@@1: "+requests);
+        System.out.println("@@@@2: "+participationRequestRepository.findAll());
 
         Long acceptedRequestsNumber = requests.stream()
                 .filter(request -> request.getStatus().equals(ParticipationRequestStatus.CONFIRMED)).count();
@@ -61,7 +64,7 @@ public class ParticipationRequestService {
         if (!requests.isEmpty()) {
             boolean isLimitEqualZero = requests.get(0).getEvent().getParticipantLimit() == 0;
             boolean isEnablePreModeration = requests.get(0).getEvent().getRequestModeration();
-            if (isLimitEqualZero || isEnablePreModeration)
+            if (isLimitEqualZero || !isEnablePreModeration)
                 return new EventRequestStatusUpdateResult();
         }
 
@@ -132,13 +135,13 @@ public class ParticipationRequestService {
         if (event == null)
             throw new EntityNotFoundException("event " + eventId + " not found");
 
-        if (Objects.equals(event.getInitiator().getId(), userId) || !event.getState().equals(EventState.PUBLISHED))
+        if (Objects.equals(event.getInitiator().getId(), userId))
             throw new ParticipationRequestsAddNotAllowedException("request from event owner is not allowed");
 
         if (event.getParticipantLimit().equals(event.getRequests().size()))
             throw new ParticipationRequestsLimitException("The participant limit has been reached");
 
-        if (event.getRequests().stream().noneMatch(
+        if (event.getRequests().stream().anyMatch(
                 r -> Objects.equals(r.getRequester().getId(), userId) && Objects.equals(r.getEvent().getId(), eventId)))
             throw new ParticipationRequestsDuplicateException("request is present");
 

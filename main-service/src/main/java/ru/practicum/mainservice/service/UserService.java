@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.mainservice.dto.UserDto;
 import ru.practicum.mainservice.dto.mapper.UserMapper;
+import ru.practicum.mainservice.exception.DublicateNameException;
 import ru.practicum.mainservice.exception.EntityNotFoundException;
 import ru.practicum.mainservice.exception.IncorrectDataException;
 import ru.practicum.mainservice.models.User;
@@ -37,6 +38,10 @@ public class UserService {
         if (userDto == null || userDto.getName() == null || userDto.getName().isBlank() ||
                 userDto.getEmail() == null || userDto.getEmail().isBlank())
             throw new IncorrectDataException("incorrect user data");
+        User oldUser = userRepository.findUserByNameLike(userDto.getName());
+        if (oldUser != null)
+            throw new DublicateNameException("incorrect user data");
+
         User user = UserMapper.toUser(userDto);
         User newUser = userRepository.save(user);
         return UserMapper.toUserDto(newUser);
@@ -46,6 +51,7 @@ public class UserService {
         User userToDelete = userRepository.findById(id).orElse(null);
         if (userToDelete == null)
             throw new EntityNotFoundException("user " + id + " not found");
+
         userRepository.delete(userToDelete);
     }
 }

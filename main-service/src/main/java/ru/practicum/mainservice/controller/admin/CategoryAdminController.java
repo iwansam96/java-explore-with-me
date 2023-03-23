@@ -20,20 +20,20 @@ public class CategoryAdminController {
 
     @PostMapping
     public CategoryDto save(@RequestBody NewCategoryDto categoryDto) {
-        log.info("POST category");
+        log.info("POST /admin/categories");
         return categoryService.save(categoryDto);
     }
 
     @DeleteMapping("/{catId}")
     public void delete(@Valid @NotNull @PathVariable Long catId) {
-        log.info("DELETE category {}", catId);
+        log.info("DELETE /admin/categories/{}", catId);
         categoryService.delete(catId);
     }
 
     @PatchMapping("/{catId}")
     public CategoryDto update(@RequestBody NewCategoryDto categoryDto,
                                          @Valid @NotNull @PathVariable Long catId) {
-        log.info("PATCH category {}; new category: " + categoryDto, catId);
-        return categoryService.save(categoryDto, catId);
+        log.info("PATCH /admin/categories/{}; new category: " + categoryDto, catId);
+        return categoryService.update(categoryDto, catId);
     }
 }

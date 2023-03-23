@@ -8,4 +8,8 @@ import java.util.List;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllByIdIn(Pageable pageable, List<Long> ids);
+
+    User findUserByNameLike(String name);
+
+    User findUserByEmailLike(String name);
 }
