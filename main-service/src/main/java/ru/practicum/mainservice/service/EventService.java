@@ -236,19 +236,28 @@ public class EventService {
         if (eventToUpdate == null) {
             throw new EntityNotFoundException("event " + eventId + " not found");
         }
-
-        if (updatedEvent == null || updatedEvent.getEventDate() == null)
+        if (updatedEvent == null)
             return EventMapper.toEventFullDto(eventToUpdate, getEventHits(uri, eventToUpdate));
 
-        if (LocalDateTime.now().plusHours(1).isAfter(updatedEvent.getEventDate())) {
+//        изменение времени события на некорректное
+        if (updatedEvent.getEventDate() != null && LocalDateTime.now().plusHours(1).isAfter(updatedEvent.getEventDate())) {
             throw new InvalidEventParametersException("Дата и время на которые намечено событие не может быть раньше, " +
                     "чем через час от текущего момента");
         }
 
-        if (EventState.PUBLISHED.equals(eventToUpdate.getState()) || EventState.CANCELED.equals(eventToUpdate.getState())) {
-            throw new InvalidEventParametersException("event is already published on canceled");
+//        публикация опубликованного события
+        if (EventState.PUBLISHED.equals(eventToUpdate.getState()) &&
+                EventStateAction.PUBLISH_EVENT.equals(updatedEvent.getStateAction())) {
+            throw new InvalidEventParametersException("event is already published");
         }
 
+//        публикация отмененного события
+        if (EventState.CANCELED.equals(eventToUpdate.getState()) &&
+                EventStateAction.PUBLISH_EVENT.equals(updatedEvent.getStateAction())) {
+            throw new InvalidEventParametersException("event is already canceled");
+        }
+
+//        отмена опубликованного события
         if (EventState.PUBLISHED.equals(eventToUpdate.getState()) &&
                 EventStateAction.REJECT_EVENT.equals(updatedEvent.getStateAction())) {
             throw new InvalidEventParametersException("cannot cancel already published event");
@@ -256,25 +265,31 @@ public class EventService {
 
 
 
-
-        if (updatedEvent.getStateAction().equals(EventStateAction.PUBLISH_EVENT) &&
-                eventToUpdate.getState().equals(EventState.PENDING))
+        if (updatedEvent.getStateAction().equals(EventStateAction.PUBLISH_EVENT)) {
             eventToUpdate.setState(EventState.PUBLISHED);
-        else if (updatedEvent.getStateAction().equals(EventStateAction.REJECT_EVENT) &&
-                !eventToUpdate.getState().equals(EventState.PUBLISHED)) {
+        }
+        else if (updatedEvent.getStateAction().equals(EventStateAction.REJECT_EVENT)) {
             eventToUpdate.setState(EventState.CANCELED);
         } else {
             throw new EventWithWrongStateException("event is not in the right state");
         }
 
-        eventToUpdate.setAnnotation(updatedEvent.getAnnotation());
-        eventToUpdate.setDescription(updatedEvent.getDescription());
-        eventToUpdate.setEventDate(updatedEvent.getEventDate());
-        eventToUpdate.setLocation(updatedEvent.getLocation());
-        eventToUpdate.setPaid(updatedEvent.getPaid());
-        eventToUpdate.setParticipantLimit(updatedEvent.getParticipantLimit());
-        eventToUpdate.setRequestModeration(updatedEvent.getRequestModeration());
-        eventToUpdate.setTitle(updatedEvent.getTitle());
+        if (updatedEvent.getAnnotation() != null)
+            eventToUpdate.setAnnotation(updatedEvent.getAnnotation());
+        if (updatedEvent.getDescription() != null)
+            eventToUpdate.setDescription(updatedEvent.getDescription());
+        if (updatedEvent.getEventDate() != null)
+            eventToUpdate.setEventDate(updatedEvent.getEventDate());
+        if (updatedEvent.getLocation() != null)
+            eventToUpdate.setLocation(updatedEvent.getLocation());
+        if (updatedEvent.getPaid() != null)
+            eventToUpdate.setPaid(updatedEvent.getPaid());
+        if (updatedEvent.getParticipantLimit() != null)
+            eventToUpdate.setParticipantLimit(updatedEvent.getParticipantLimit());
+        if (updatedEvent.getRequestModeration() != null)
+            eventToUpdate.setRequestModeration(updatedEvent.getRequestModeration());
+        if (updatedEvent.getTitle() != null)
+            eventToUpdate.setTitle(updatedEvent.getTitle());
 
         Event savedEvent = eventRepository.save(eventToUpdate);
 
@@ -285,37 +300,44 @@ public class EventService {
         Event eventToUpdate = eventRepository.findEventByIdAndInitiator_Id(eventId, userId);
         if (eventToUpdate == null)
             throw new EntityNotFoundException("event " + eventId + " not found");
-
-        if (updatedEvent == null || updatedEvent.getEventDate() == null || updatedEvent.getStateAction() == null)
+        if (updatedEvent == null)
             return EventMapper.toEventFullDto(eventToUpdate, getEventHits(uri, eventToUpdate));
 
-        if (updatedEvent.getEventDate().isBefore(LocalDateTime.now().minusHours(2))) {
+        if (updatedEvent.getEventDate() != null && LocalDateTime.now().minusHours(2).isAfter(updatedEvent.getEventDate())) {
             throw new InvalidEventParametersException("Дата и время на которые намечено событие не может быть раньше, " +
                     "чем через два часа от текущего момента");
         }
 
 
-        boolean isEventCanceled = eventToUpdate.getState().equals(EventState.CANCELED);
-        boolean isEventPending = eventToUpdate.getState().equals(EventState.PENDING);
+        boolean isEventCanceled = EventState.CANCELED.equals(eventToUpdate.getState());
+        boolean isEventPending = EventState.PENDING.equals(eventToUpdate.getState());
         if ( !(isEventCanceled || isEventPending) )
             throw new EventChangeNotAllowedException("Only pending or canceled events can be changed");
 
-        if (updatedEvent.getStateAction().equals(EventStateAction.CANCEL_REVIEW))
+        if (EventStateAction.CANCEL_REVIEW.equals(updatedEvent.getStateAction()))
             eventToUpdate.setState(EventState.CANCELED);
-        else if (updatedEvent.getStateAction().equals(EventStateAction.SEND_TO_REVIEW)) {
+        else if (EventStateAction.SEND_TO_REVIEW.equals(updatedEvent.getStateAction())) {
             eventToUpdate.setState(EventState.PENDING);
         } else {
             throw new EventWithWrongStateException("event is not in the right state");
         }
 
-        eventToUpdate.setAnnotation(updatedEvent.getAnnotation());
-        eventToUpdate.setDescription(updatedEvent.getDescription());
-        eventToUpdate.setEventDate(updatedEvent.getEventDate());
-        eventToUpdate.setLocation(updatedEvent.getLocation());
-        eventToUpdate.setPaid(updatedEvent.getPaid());
-        eventToUpdate.setParticipantLimit(updatedEvent.getParticipantLimit());
-        eventToUpdate.setRequestModeration(updatedEvent.getRequestModeration());
-        eventToUpdate.setTitle(updatedEvent.getTitle());
+        if (updatedEvent.getAnnotation() != null)
+            eventToUpdate.setAnnotation(updatedEvent.getAnnotation());
+        if (updatedEvent.getDescription() != null)
+            eventToUpdate.setDescription(updatedEvent.getDescription());
+        if (updatedEvent.getEventDate() != null)
+            eventToUpdate.setEventDate(updatedEvent.getEventDate());
+        if (updatedEvent.getLocation() != null)
+            eventToUpdate.setLocation(updatedEvent.getLocation());
+        if (updatedEvent.getPaid() != null)
+            eventToUpdate.setPaid(updatedEvent.getPaid());
+        if (updatedEvent.getParticipantLimit() != null)
+            eventToUpdate.setParticipantLimit(updatedEvent.getParticipantLimit());
+        if (updatedEvent.getRequestModeration() != null)
+            eventToUpdate.setRequestModeration(updatedEvent.getRequestModeration());
+        if (updatedEvent.getTitle() != null)
+            eventToUpdate.setTitle(updatedEvent.getTitle());
 
         Event savedEvent = eventRepository.save(eventToUpdate);
 

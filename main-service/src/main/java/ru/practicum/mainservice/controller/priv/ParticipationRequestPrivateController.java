@@ -33,8 +33,8 @@ public class ParticipationRequestPrivateController {
     }
 
     @PatchMapping("/{requestId}/cancel")
-    public ParticipationRequestDto update(@Valid @NotNull @PathVariable Long userId,
-                              @Valid @NotNull @PathVariable Long requestId) {
+    public ParticipationRequestDto cancel(@Valid @NotNull @PathVariable Long userId,
+                                          @Valid @NotNull @PathVariable Long requestId) {
         log.info("POST /users/" + userId + "/requests/" + requestId + "/cancel");
         return participationRequestService.cancel(userId, requestId);
     }

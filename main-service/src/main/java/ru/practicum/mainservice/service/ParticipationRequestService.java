@@ -135,15 +135,23 @@ public class ParticipationRequestService {
         if (event == null)
             throw new EntityNotFoundException("event " + eventId + " not found");
 
+//        запрос на участие от владельца события
         if (Objects.equals(event.getInitiator().getId(), userId))
             throw new ParticipationRequestsAddNotAllowedException("request from event owner is not allowed");
 
-        if (event.getParticipantLimit().equals(event.getRequests().size()))
-            throw new ParticipationRequestsLimitException("The participant limit has been reached");
+//        достигнут лимит участников
+        if (Objects.equals(event.getParticipantLimit(), (long) event.getRequests().size()))
+            throw new ParticipationRequestsLimitException("the participant limit has been reached");
 
+//        запрос на участие в неопубликованном событии
+        if (!EventState.PUBLISHED.equals(event.getState()))
+            throw new ParticipationRequestsAddNotAllowedException("cannot request participation in not published event");
+
+//        повторный запрос на участие
         if (event.getRequests().stream().anyMatch(
                 r -> Objects.equals(r.getRequester().getId(), userId) && Objects.equals(r.getEvent().getId(), eventId)))
             throw new ParticipationRequestsDuplicateException("request is present");
+
 
         ParticipationRequest newRequest;
         if (event.getRequestModeration())
