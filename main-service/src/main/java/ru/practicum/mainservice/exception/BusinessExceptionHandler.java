@@ -78,4 +78,10 @@ public class BusinessExceptionHandler {
         return new ResponseEntity<>("{\"status\": \""+e.getMessage()+"\"}", HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler({ Exception.class })
+    public ResponseEntity<Object> handleAllExceptions(Exception e) {
+        log.error(e.getMessage());
+        return new ResponseEntity<>("{\"status\": \""+e.getMessage()+"\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 }
