@@ -2,6 +2,7 @@ package ru.practicum.mainservice.controller.priv;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.mainservice.dto.*;
 import ru.practicum.mainservice.service.EventService;
@@ -30,6 +31,7 @@ public class EventPrivateController {
         return eventService.getShort(userId, from, size, uri);
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public EventFullDto save(@Valid @NotNull @PathVariable Long userId,
                              @Valid @NotNull @RequestBody NewEventDto newEventDto,

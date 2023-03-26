@@ -69,8 +69,6 @@ public class ParticipationRequestService {
 //        обход всех заявок для которых нужно обновить статус
         for (var request : requests) {
             if (!request.getStatus().equals(ParticipationRequestStatus.PENDING)) {
-//                requests.remove(request);
-//                break;
                 throw new ParticipationRequestsChangeStatusException("request must have status PENDING");
             }
 //            если лимит заявок не достигнут, устанавливаем переданный статус
@@ -153,12 +151,14 @@ public class ParticipationRequestService {
 
 
         ParticipationRequest newRequest;
-        if (event.getRequestModeration())
+        if (event.getRequestModeration()) {
             newRequest = ParticipationRequestMapper.toParticipationRequest(user,
                 ParticipationRequestStatus.PENDING, event);
-        else
+        }
+        else {
             newRequest = ParticipationRequestMapper.toParticipationRequest(user,
                     ParticipationRequestStatus.CONFIRMED, event);
+        }
 
         ParticipationRequest savedRequest = participationRequestRepository.save(newRequest);
 
