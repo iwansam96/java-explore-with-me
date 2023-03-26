@@ -20,11 +20,11 @@ public class UserAdminController {
     private final UserService userService;
 
     @GetMapping
-    public List<UserDto> get(@RequestParam(required = false) List<Long> users,
+    public List<UserDto> get(@RequestParam(required = false) List<Long> ids,
                              @RequestParam(defaultValue = "0") Integer from,
                              @RequestParam(defaultValue = "10") Integer size) {
         log.info("GET all users");
-        return userService.get(users, from, size);
+        return userService.get(ids, from, size);
     }
 
     @ResponseStatus(HttpStatus.CREATED)

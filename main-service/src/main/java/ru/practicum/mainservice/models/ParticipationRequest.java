@@ -53,4 +53,15 @@ public class ParticipationRequest {
     public int hashCode() {
         return getClass().hashCode();
     }
+
+    @Override
+    public String toString() {
+        return "ParticipationRequest{" +
+                "id=" + id +
+                ", created=" + created +
+                ", event=" + event +
+                ", requester=" + requester +
+                ", status=" + status +
+                '}';
+    }
 }

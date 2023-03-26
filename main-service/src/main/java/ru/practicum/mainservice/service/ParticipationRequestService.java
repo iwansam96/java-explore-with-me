@@ -44,30 +44,25 @@ public class ParticipationRequestService {
             throw new EntityNotFoundException("user " + userId + " not found");
 
         Event event = eventRepository.findById(eventId).orElse(null);
-        if (event == null) {
+        if (event == null)
             throw new EntityNotFoundException("event " + eventId + " not found");
-        }
 
-        var requests = participationRequestRepository.findAllByIdIn(updateRequest.getRequestIds());
+        var requests = event.getRequests();
 
         Long acceptedRequestsNumber = requests.stream()
-                .filter(request -> request.getStatus().equals(ParticipationRequestStatus.CONFIRMED)).count();
+                .filter(request -> request.getStatus().equals(ParticipationRequestStatus.CONFIRMED))
+                .count();
 
-        if (Objects.equals(event.getParticipantLimit(), acceptedRequestsNumber)) {
+        if (acceptedRequestsNumber.equals(event.getParticipantLimit())) {
             throw new ParticipationRequestsLimitException("The participant limit has been reached");
         }
 
-        if (!requests.isEmpty()) {
-            boolean isLimitEqualZero = requests.get(0).getEvent().getParticipantLimit() == 0;
-            boolean isEnablePreModeration = requests.get(0).getEvent().getRequestModeration();
-            if (isLimitEqualZero || !isEnablePreModeration)
-                return new EventRequestStatusUpdateResult();
-        }
 
 
         List<ParticipationRequest> updatedRequests = new ArrayList<>();
 //        обход всех заявок для которых нужно обновить статус
-        for (var request : requests) {
+        for (var request : requests.stream()
+                .filter(r -> updateRequest.getRequestIds().contains(r.getId())).collect(Collectors.toList())) {
             if (!request.getStatus().equals(ParticipationRequestStatus.PENDING)) {
                 throw new ParticipationRequestsChangeStatusException("request must have status PENDING");
             }
@@ -78,26 +73,10 @@ public class ParticipationRequestService {
                 acceptedRequestsNumber++;
 //                иначе отклоняем все остальные переданные на вход зявки
             } else {
-                request.setStatus(ParticipationRequestStatus.REJECTED);
-                updatedRequests.add(request);
+                throw new ParticipationRequestsLimitException("the participant limit has been reached");
             }
         }
-//        отклоняем все непринятые заявки если достигнут лимит
-        if (event.getParticipantLimit() <= acceptedRequestsNumber) {
-//            выбираем непринятые заявки из всех
-            List<ParticipationRequest> notAcceptedRequests = requests.stream()
-                    .filter(request -> !request.getStatus().equals(ParticipationRequestStatus.CONFIRMED))
-                    .collect(Collectors.toList());
-//            исключаем из списка непринятых заявок те, что обработаны выше
-            notAcceptedRequests = notAcceptedRequests.stream()
-                    .filter(r -> updateRequest.getRequestIds().contains(r.getId()))
-                    .collect(Collectors.toList());
-//            отклоняем
-            for (var request : notAcceptedRequests) {
-                request.setStatus(ParticipationRequestStatus.REJECTED);
-                updatedRequests.add(request);
-            }
-        }
+
         participationRequestRepository.saveAll(updatedRequests);
 
 
@@ -136,9 +115,12 @@ public class ParticipationRequestService {
         if (Objects.equals(event.getInitiator().getId(), userId))
             throw new ParticipationRequestsAddNotAllowedException("request from event owner is not allowed");
 
-////        достигнут лимит участников
-//        if (Objects.equals(event.getParticipantLimit(), (long) event.getRequests().size()))
-//            throw new ParticipationRequestsLimitException("the participant limit has been reached");
+//        достигнут лимит участников
+        Long acceptedRequestsNumber = event.getRequests().stream()
+                .filter(request -> request.getStatus().equals(ParticipationRequestStatus.CONFIRMED))
+                .count();
+        if (Objects.equals(event.getParticipantLimit(), acceptedRequestsNumber))
+            throw new ParticipationRequestsLimitException("the participant limit has been reached");
 
 //        запрос на участие в неопубликованном событии
         if (!EventState.PUBLISHED.equals(event.getState()))
@@ -174,7 +156,7 @@ public class ParticipationRequestService {
         if (request == null)
             throw new EntityNotFoundException("request " + requestId + " not found");
 
-        request.setStatus(ParticipationRequestStatus.PENDING);
+        request.setStatus(ParticipationRequestStatus.CANCELED);
 
         ParticipationRequest canceledRequest = participationRequestRepository.save(request);
 

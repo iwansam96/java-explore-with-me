@@ -7,15 +7,10 @@ import ru.practicum.mainservice.models.ParticipationRequestStatus;
 import ru.practicum.mainservice.models.User;
 
 public class ParticipationRequestMapper {
-
-//    public static ParticipationRequest toParticipationRequest() {
-//
-//    }
-
     public static ParticipationRequestDto toParticipationRequestDto(ParticipationRequest request) {
         ParticipationRequestDto requestDto = new ParticipationRequestDto();
         requestDto.setCreated(request.getCreated());
-        requestDto.setEvent(request.getId());
+        requestDto.setEvent(request.getEvent().getId());
         requestDto.setId(request.getId());
         requestDto.setRequester(request.getRequester().getId());
         requestDto.setStatus(request.getStatus());
