@@ -348,8 +348,10 @@ public class EventService {
     private Long getEventHits(String uri, Event event) {
         var stat = eventClient.getStats(event.getCreatedOn(), LocalDateTime.now(), List.of(uri), false);
         Long hits = 0L;
-        if (stat != null && !stat.isEmpty())
+        if (stat != null && !stat.isEmpty()) {
+//            System.out.println("@@@@@@@@@@@@@@@@@ "+stat);
             hits = stat.get(0).getHits();
+        }
         return hits;
     }
 }
