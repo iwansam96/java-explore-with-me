@@ -12,6 +12,7 @@ import ru.practicum.stats.dto.EventOutputDto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -48,6 +49,10 @@ public class EventClient extends BaseClient {
             }
         }
 
-        return (List<EventOutputDto>) get(pathBuilder.toString(), null).getBody();
+        ResponseEntity<EventOutputDto[]> response = rest.getForEntity(pathBuilder.toString(), EventOutputDto[].class);
+
+        if (response == null || response.getBody() == null || response.getBody().length == 0)
+            return new ArrayList<>();
+        return List.of(response.getBody());
     }
 }

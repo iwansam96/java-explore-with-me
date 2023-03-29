@@ -31,13 +31,16 @@ public class StatsServerController {
     }
 
     @GetMapping("/stats")
-    public List<EventOutputDto> getStats(@RequestParam @JsonSerialize(using = LocalDateTimeSerializer.class)
-                                             @DateTimeFormat(pattern = datePattern) LocalDateTime start,
-                                        @RequestParam @JsonSerialize(using = LocalDateTimeSerializer.class)
-                                             @DateTimeFormat(pattern = datePattern) LocalDateTime end,
-                                        @RequestParam(required = false) List<String> uris,
-                                        @RequestParam(defaultValue = "false") Boolean unique) {
+    public EventOutputDto[] getStats(@RequestParam @JsonSerialize(using = LocalDateTimeSerializer.class)
+                                         @DateTimeFormat(pattern = datePattern) LocalDateTime start,
+                                     @RequestParam @JsonSerialize(using = LocalDateTimeSerializer.class)
+                                         @DateTimeFormat(pattern = datePattern) LocalDateTime end,
+                                     @RequestParam(required = false) List<String> uris,
+                                     @RequestParam(defaultValue = "false") Boolean unique) {
         log.info("GET /event/, start=" + start + ", end=" + end + ", uris=" + uris + ", unique=" + unique);
-        return service.getStats(start, end, uris, unique);
+
+        var stats = service.getStats(start, end, uris, unique);
+        var statsArray = new EventOutputDto[stats.size()];
+        return stats.toArray(stats.toArray(statsArray));
     }
 }

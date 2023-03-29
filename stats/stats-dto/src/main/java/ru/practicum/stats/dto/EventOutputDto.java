@@ -36,4 +36,12 @@ public class EventOutputDto {
         this.uri = uri;
     }
 
+    @Override
+    public String toString() {
+        return "EventOutputDto{" +
+                "app='" + app + '\'' +
+                ", uri='" + uri + '\'' +
+                ", hits=" + hits +
+                '}';
+    }
 }

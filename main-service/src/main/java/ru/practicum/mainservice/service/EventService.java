@@ -99,7 +99,6 @@ public class EventService {
                 hits = stat.get(0).getHits();
             }
             eventsDto.add(EventMapper.toEventShortDto(event, hits));
-            eventClient.addStat(new EventInputDto(ip, uri+"/"+event.getId(), "ewm-main"));
         }
 
         if (sort != null && sort.equals(EventSort.EVENT_DATE))
@@ -107,6 +106,7 @@ public class EventService {
         else if (sort != null && sort.equals(EventSort.VIEWS))
             eventsDto = eventsDto.stream().sorted(Comparator.comparing(EventShortDto::getViews)).collect(Collectors.toList());
 
+        eventClient.addStat(new EventInputDto("ewm-main", uri, ip));
         return eventsDto;
     }
 
@@ -116,7 +116,7 @@ public class EventService {
         if (event == null || !event.getState().equals(EventState.PUBLISHED))
             throw new EntityNotFoundException("event " + eventId + " not found");
 
-        eventClient.addStat(new EventInputDto(ip, uri, "ewm-main"));
+        eventClient.addStat(new EventInputDto("ewm-main", uri, ip));
 
         Long hits = getEventHits(uri, event);
 
@@ -349,7 +349,6 @@ public class EventService {
         var stat = eventClient.getStats(event.getCreatedOn(), LocalDateTime.now(), List.of(uri), false);
         Long hits = 0L;
         if (stat != null && !stat.isEmpty()) {
-//            System.out.println("@@@@@@@@@@@@@@@@@ "+stat);
             hits = stat.get(0).getHits();
         }
         return hits;
