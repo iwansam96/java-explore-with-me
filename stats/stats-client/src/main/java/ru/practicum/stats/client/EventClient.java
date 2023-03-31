@@ -1,17 +1,26 @@
 package ru.practicum.stats.client;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.stats.dto.EventInputDto;
+import ru.practicum.stats.dto.EventOutputDto;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class EventClient extends BaseClient {
 
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    @Autowired
     public EventClient(@Value("${stats-server.url}") String serverUrl, RestTemplateBuilder builder) {
         super(
                 builder.uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
@@ -20,16 +29,17 @@ public class EventClient extends BaseClient {
         );
     }
 
-    ResponseEntity<Object> addStat(EventInputDto eventInputDto) {
+    public ResponseEntity<Object> addStat(EventInputDto eventInputDto) {
         return post("/hit", null, eventInputDto);
     }
 
-    ResponseEntity<Object> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
+    public List<EventOutputDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         StringBuilder pathBuilder = new StringBuilder();
+        pathBuilder.append("/stats");
         pathBuilder.append("?start=");
-        pathBuilder.append(start);
+        pathBuilder.append(start.format(formatter));
         pathBuilder.append("&end=");
-        pathBuilder.append(end);
+        pathBuilder.append(end.format(formatter));
         pathBuilder.append("&unique=");
         pathBuilder.append(unique);
         if (uris != null && !uris.isEmpty()) {
@@ -39,6 +49,10 @@ public class EventClient extends BaseClient {
             }
         }
 
-        return get("/stats", null);
+        ResponseEntity<EventOutputDto[]> response = rest.getForEntity(pathBuilder.toString(), EventOutputDto[].class);
+
+        if (response == null || response.getBody() == null || response.getBody().length == 0)
+            return new ArrayList<>();
+        return List.of(response.getBody());
     }
 }

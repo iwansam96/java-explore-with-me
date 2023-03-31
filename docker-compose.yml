@@ -1,18 +1,5 @@
 version: '3.1'
 services:
-  stats-server:
-    build: ./stats/stats-server
-    image: stats-server-dock
-    container_name: stats-server
-    ports:
-      - "9090:9090"
-    depends_on:
-      - stats-db
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/explorewithme
-      - SPRING_DATASOURCE_USER=root
-      - SPRING_DATASOURCE_PASS=root
-
   stats-db:
     image: postgres:14-alpine
     container_name: stats-db
@@ -24,6 +11,45 @@ services:
       - POSTGRES_PASSWORD=root
       - POSTGRES_HOST=stats-db
       - POSTGRES_PORT=5432
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U root -d explorewithme" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  ewm-db:
+    image: postgres:14-alpine
+    container_name: ewm-db
+    ports:
+      - "6541:5432"
+    environment:
+      - POSTGRES_DB=explorewithme
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_HOST=ewm-db
+      - POSTGRES_PORT=5432
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U root -d explorewithme" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  stats-server:
+    build: ./stats/stats-server
+    image: stats-server-dock
+    container_name: stats-server
+    ports:
+      - "9090:9090"
+      - "9091:9091"
+    depends_on:
+      stats-db:
+        condition: service_healthy
+      ewm-db:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/explorewithme
+      - SPRING_DATASOURCE_USER=root
+      - SPRING_DATASOURCE_PASS=root
 
   ewm-service:
     build: ./main-service
@@ -31,24 +57,13 @@ services:
     container_name: ewm-service
     ports:
       - "8080:8080"
+      - "8081:8081"
     depends_on:
-      - stats-server
-      - ewm-db
+      stats-db:
+        condition: service_healthy
+      ewm-db:
+        condition: service_healthy
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/explorewithme
       - SPRING_DATASOURCE_USER=root
       - SPRING_DATASOURCE_PASS=root
-
-  ewm-db:
-    image: postgres:14-alpine
-    container_name: ewm-db
-    ports:
-      - "6541:5432"
-    depends_on:
-      - stats-db
-    environment:
-      - POSTGRES_DB=explorewithme
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
-      - POSTGRES_HOST=ewm-db
-      - POSTGRES_PORT=5432
