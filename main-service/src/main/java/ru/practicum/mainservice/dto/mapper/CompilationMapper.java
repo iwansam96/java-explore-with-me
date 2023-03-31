@@ -1,5 +1,7 @@
 package ru.practicum.mainservice.dto.mapper;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.practicum.mainservice.dto.CompilationDto;
 import ru.practicum.mainservice.dto.NewCompilationDto;
 import ru.practicum.mainservice.dto.UpdateCompilationRequest;
@@ -8,6 +10,7 @@ import ru.practicum.mainservice.models.Event;
 
 import java.util.List;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CompilationMapper {
     public static CompilationDto toCompilationDto(Compilation compilation) {
         CompilationDto compilationDto = new CompilationDto();

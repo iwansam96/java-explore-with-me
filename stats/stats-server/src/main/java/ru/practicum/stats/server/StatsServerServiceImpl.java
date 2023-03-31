@@ -2,6 +2,7 @@ package ru.practicum.stats.server;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.stats.dto.EventInputDto;
 import ru.practicum.stats.dto.EventOutputDto;
 
@@ -18,6 +19,7 @@ public class StatsServerServiceImpl implements StatsServerService {
     private final StatsServerRepository repository;
 
     @Override
+    @Transactional
     public Event hit(EventInputDto eventInputDto) {
         Event event = EventMapper.toEvent(eventInputDto);
         return repository.save(event);

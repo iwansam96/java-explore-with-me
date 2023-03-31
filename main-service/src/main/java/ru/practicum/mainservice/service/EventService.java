@@ -3,6 +3,7 @@ package ru.practicum.mainservice.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.mainservice.dto.*;
 import ru.practicum.mainservice.dto.mapper.EventMapper;
 import ru.practicum.mainservice.exception.EntityNotFoundException;
@@ -43,7 +44,7 @@ public class EventService {
 
         List<Event> events;
         if (rangeEnd != null && paid != null && categories != null && text != null)
-            events = eventRepository.findAllByStateIsAndEventDateBetweenAndAnnotationContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndCategory_IdInAndPaidIs(
+            events = eventRepository.getByRangeTextsCategoryAndPaid(
                     pageRequest,
                     EventState.PUBLISHED,
                     rangeStart,
@@ -54,7 +55,7 @@ public class EventService {
                     paid
             );
         else if (paid != null && categories != null && text != null)
-            events = eventRepository.findAllByStateIsAndEventDateAfterAndAnnotationContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndCategory_IdInAndPaidIs(
+            events = eventRepository.getByDateAfterTextsCategoryAndPaid(
                     pageRequest,
                     EventState.PUBLISHED,
                     rangeStart,
@@ -64,7 +65,7 @@ public class EventService {
                     paid
             );
         else if (categories != null && text != null)
-            events = eventRepository.findAllByStateIsAndEventDateAfterAndAnnotationContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndCategory_IdIn(
+            events = eventRepository.getByDateAfterTextsCategory(
                     pageRequest,
                     EventState.PUBLISHED,
                     rangeStart,
@@ -74,7 +75,7 @@ public class EventService {
             );
         else if (text != null)
             events =
-                eventRepository.findAllByStateIsAndEventDateAfterAndAnnotationContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+                eventRepository.getByDateAfterTexts(
                         pageRequest,
                         EventState.PUBLISHED,
                         rangeStart,
@@ -148,7 +149,7 @@ public class EventService {
 
         List<Event> events;
         if (users != null && states != null && categories != null && rangeStart != null && rangeEnd != null)
-            events = eventRepository.findAllByInitiator_IdInAndStateInAndCategory_IdInAndAndEventDateBetween(
+            events = eventRepository.getByDatesBetween(
                     pageRequest,
                     users,
                     states.stream().map(EventState::valueOf).collect(Collectors.toList()),
@@ -157,7 +158,7 @@ public class EventService {
                     rangeEnd
             );
         else if (users != null && states != null && categories != null && rangeStart != null)
-            events = eventRepository.findAllByInitiator_IdInAndStateInAndCategory_IdInAndAndEventDateAfter(
+            events = eventRepository.getByDateAfter(
                     pageRequest,
                     users,
                     states.stream().map(EventState::valueOf).collect(Collectors.toList()),
@@ -165,7 +166,7 @@ public class EventService {
                     rangeStart
             );
         else if (users != null && states != null && categories != null && rangeEnd != null)
-            events = eventRepository.findAllByInitiator_IdInAndStateInAndCategory_IdInAndAndEventDateBefore(
+            events = eventRepository.getByDateBefore(
                     pageRequest,
                     users,
                     states.stream().map(EventState::valueOf).collect(Collectors.toList()),
@@ -210,6 +211,7 @@ public class EventService {
     }
 
 
+    @Transactional
     public EventFullDto save(Long userId, NewEventDto newEventDto, String uri) {
         if (LocalDateTime.now().plusHours(2).isAfter(newEventDto.getEventDate()))
             throw new InvalidEventParametersException("Дата и время на которые намечено событие не может быть раньше, " +
@@ -231,6 +233,7 @@ public class EventService {
         return EventMapper.toEventFullDto(savedEvent,  getEventHits(uri, savedEvent));
     }
 
+    @Transactional
     public EventFullDto update(Long eventId, UpdateEventAdminRequest updatedEvent, String uri) {
         Event eventToUpdate = eventRepository.findById(eventId).orElse(null);
         if (eventToUpdate == null) {
@@ -296,6 +299,7 @@ public class EventService {
         return EventMapper.toEventFullDto(savedEvent, getEventHits(uri, savedEvent));
     }
 
+    @Transactional
     public EventFullDto update(Long userId, Long eventId, UpdateEventUserRequest updatedEvent, String uri) {
         Event eventToUpdate = eventRepository.findEventByIdAndInitiator_Id(eventId, userId);
         if (eventToUpdate == null)

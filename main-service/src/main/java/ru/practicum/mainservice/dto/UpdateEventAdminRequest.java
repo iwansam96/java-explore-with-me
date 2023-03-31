@@ -13,34 +13,34 @@ import java.time.LocalDateTime;
 @Data
 public class UpdateEventAdminRequest {
     @NotNull
-    String annotation;
+    private String annotation;
 
     @NotNull
-    Long category;
+    private Long category;
 
     @NotNull
-    String description;
+    private String description;
 
     @NotNull
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime eventDate;
+    private LocalDateTime eventDate;
 
     @NotNull
-    Location location;
+    private Location location;
 
     @NotNull
-    Boolean paid;
+    private Boolean paid;
 
     @NotNull
-    Long participantLimit;
+    private Long participantLimit;
 
     @NotNull
-    Boolean requestModeration;
+    private Boolean requestModeration;
 
     @NotNull
-    EventStateAction stateAction;
+    private EventStateAction stateAction;
 
     @NotNull
-    String title;
+    private String title;
 }

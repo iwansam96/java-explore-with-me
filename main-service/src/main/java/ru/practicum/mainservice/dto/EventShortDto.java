@@ -13,26 +13,26 @@ import java.time.LocalDateTime;
 public class EventShortDto {
 
     //    Краткое описание
-    String annotation;
+    private String annotation;
 
-    Category category;
+    private Category category;
 
     //    Количество одобренных заявок на участие в данном событии
-    Long confirmedRequests;
+    private Long confirmedRequests;
 
     //    Дата и время на которые намечено событие (в формате "yyyy-MM-dd HH:mm:ss")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime eventDate;
+    private LocalDateTime eventDate;
 
-    Long id;
+    private Long id;
 
-    User initiator;
+    private User initiator;
 
-    Boolean paid;
+    private Boolean paid;
 
-    String title;
+    private String title;
 
     //    Количество просмотрев события
-    Long views;
+    private Long views;
 }

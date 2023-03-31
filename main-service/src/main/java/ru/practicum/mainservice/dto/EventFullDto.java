@@ -15,50 +15,50 @@ import java.time.LocalDateTime;
 public class EventFullDto {
 
     //    Краткое описание
-    String annotation;
+    private String annotation;
 
-    Category category;
+    private Category category;
 
     //    Количество одобренных заявок на участие в данном событии
-    Long confirmedRequests;
+    private Long confirmedRequests;
 
     //    Дата и время создания события (в формате "yyyy-MM-dd HH:mm:ss")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime createdOn;
+    private LocalDateTime createdOn;
 
     //    Полное описание события
-    String description;
+    private String description;
 
     //    Дата и время на которые намечено событие (в формате "yyyy-MM-dd HH:mm:ss")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime eventDate;
+    private LocalDateTime eventDate;
 
-    Long id;
+    private Long id;
 
-    User initiator;
+    private User initiator;
 
-    Location location;
+    private Location location;
 
-    Boolean paid;
+    private Boolean paid;
 
     //    Ограничение на количество участников. Значение 0 - означает отсутствие ограничения
-    Long participantLimit;
+    private Long participantLimit;
 
     //    Дата и время публикации события (в формате "yyyy-MM-dd HH:mm:ss")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime publishedOn;
+    private LocalDateTime publishedOn;
 
     //    Нужна ли пре-модерация заявок на участие
-    Boolean requestModeration;
+    private Boolean requestModeration;
 
     //    PENDING, PUBLISHED, CANCELED
-    EventState state;
+    private EventState state;
 
-    String title;
+    private String title;
 
     //    Количество просмотрев события
-    Long views;
+    private Long views;
 }

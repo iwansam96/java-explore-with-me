@@ -1,5 +1,7 @@
 package ru.practicum.mainservice.dto.mapper;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.practicum.mainservice.dto.*;
 import ru.practicum.mainservice.models.Category;
 import ru.practicum.mainservice.models.Event;
@@ -9,6 +11,7 @@ import ru.practicum.stats.dto.EventInputDto;
 
 import java.time.LocalDateTime;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EventMapper {
     public static EventInputDto toEventInputDto(EventShortDto eventShortDto, String ip, String uri, String app) {
         EventInputDto eventInputDto = new EventInputDto();

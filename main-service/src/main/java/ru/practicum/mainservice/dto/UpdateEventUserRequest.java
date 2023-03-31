@@ -11,17 +11,17 @@ import java.time.LocalDateTime;
 
 @Data
 public class UpdateEventUserRequest {
-    String annotation;
-    Long category;
-    String description;
+    private String annotation;
+    private Long category;
+    private String description;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime eventDate;
-    Location location;
-    Boolean paid;
-    Long participantLimit;
-    Boolean requestModeration;
-    EventStateAction stateAction;
-    String title;
+    private LocalDateTime eventDate;
+    private Location location;
+    private Boolean paid;
+    private Long participantLimit;
+    private Boolean requestModeration;
+    private EventStateAction stateAction;
+    private String title;
 }

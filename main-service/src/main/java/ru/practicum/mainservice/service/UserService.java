@@ -3,6 +3,7 @@ package ru.practicum.mainservice.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.mainservice.dto.UserDto;
 import ru.practicum.mainservice.dto.mapper.UserMapper;
 import ru.practicum.mainservice.exception.DublicateNameException;
@@ -34,6 +35,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public UserDto save(UserDto userDto) {
         if (userDto == null || userDto.getName() == null || userDto.getName().isBlank() ||
                 userDto.getEmail() == null || userDto.getEmail().isBlank())
@@ -47,6 +49,7 @@ public class UserService {
         return UserMapper.toUserDto(newUser);
     }
 
+    @Transactional
     public void delete(Long id) {
         User userToDelete = userRepository.findById(id).orElse(null);
         if (userToDelete == null)

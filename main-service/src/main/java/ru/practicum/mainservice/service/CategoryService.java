@@ -1,13 +1,12 @@
 package ru.practicum.mainservice.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.mainservice.dto.CategoryDto;
 import ru.practicum.mainservice.dto.NewCategoryDto;
 import ru.practicum.mainservice.dto.mapper.CategoryMapper;
-import ru.practicum.mainservice.exception.CategoryIsInUseException;
 import ru.practicum.mainservice.exception.DublicateNameException;
 import ru.practicum.mainservice.exception.EntityNotFoundException;
 import ru.practicum.mainservice.exception.IncorrectDataException;
@@ -41,6 +40,7 @@ public class CategoryService {
         return CategoryMapper.toCategoryDto(category);
     }
 
+    @Transactional
     public CategoryDto save(NewCategoryDto categoryDto) {
         if (categoryDto == null || categoryDto.getName() == null || categoryDto.getName().isBlank())
             throw new IncorrectDataException("incorrect category data");
@@ -54,6 +54,7 @@ public class CategoryService {
         return CategoryMapper.toCategoryDto(newCategory);
     }
 
+    @Transactional
     public CategoryDto update(NewCategoryDto categoryDto, Long catId) {
         if (categoryDto == null || categoryDto.getName() == null || categoryDto.getName().isBlank())
             throw new IncorrectDataException("incorrect category data");
@@ -68,15 +69,12 @@ public class CategoryService {
         return CategoryMapper.toCategoryDto(newCategory);
     }
 
+    @Transactional
     public void delete(Long id) {
         Category categoryToDelete = categoryRepository.findById(id).orElse(null);
         if (categoryToDelete == null)
             throw new EntityNotFoundException("category " + id + " not found");
 
-        try {
-            categoryRepository.delete(categoryToDelete);
-        } catch (DataIntegrityViolationException e) {
-            throw new CategoryIsInUseException("category " + categoryToDelete.getName() + " is in use");
-        }
+        categoryRepository.delete(categoryToDelete);
     }
 }

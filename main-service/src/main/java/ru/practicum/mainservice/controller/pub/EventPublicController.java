@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.mainservice.dto.EventFullDto;
 import ru.practicum.mainservice.dto.EventShortDto;
@@ -11,7 +12,7 @@ import ru.practicum.mainservice.models.EventSort;
 import ru.practicum.mainservice.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequestMapping("/events")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class EventPublicController {
 
     private final EventService eventService;
@@ -33,8 +35,8 @@ public class EventPublicController {
             @RequestParam(required = false) @JsonSerialize(using = LocalDateTimeSerializer.class) LocalDateTime rangeEnd,
             @RequestParam(defaultValue = "false") Boolean onlyAvailable,
             @RequestParam(required = false) EventSort sort,
-            @RequestParam(defaultValue = "0") Integer from,
-            @RequestParam(defaultValue = "10") Integer size,
+            @Min(0) @RequestParam(defaultValue = "0") Integer from,
+            @Min(0) @RequestParam(defaultValue = "10") Integer size,
             HttpServletRequest request) {
         log.info("GET /events");
         String ip = request.getRemoteAddr();
@@ -43,7 +45,7 @@ public class EventPublicController {
     }
 
     @GetMapping("/{eventId}")
-    public EventFullDto getFull(@Valid @NotNull @PathVariable Long eventId, HttpServletRequest request) {
+    public EventFullDto getFull(@Min(0) @NotNull @PathVariable Long eventId, HttpServletRequest request) {
         log.info("GET /events/{}", eventId);
         String ip = request.getRemoteAddr();
         String uri = request.getRequestURI();

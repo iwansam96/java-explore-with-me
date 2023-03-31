@@ -12,9 +12,9 @@ import java.time.LocalDateTime;
 public class ParticipationRequestDto {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime created;
-    Long event;
-    Long id;
-    Long requester;
-    ParticipationRequestStatus status;
+    private LocalDateTime created;
+    private Long event;
+    private Long id;
+    private Long requester;
+    private ParticipationRequestStatus status;
 }

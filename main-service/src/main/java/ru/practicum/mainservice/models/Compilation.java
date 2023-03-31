@@ -18,19 +18,19 @@ import java.util.Objects;
 public class Compilation {
 
     @ManyToMany
-    List<Event> events;
+    private List<Event> events;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "compilation_id")
-    Long id;
+    private Long id;
 
     @Column(name = "compilation_is_pinned")
-    Boolean pinned;
+    private Boolean pinned;
 
     @NotBlank
     @Column(name = "compilation_title")
-    String title;
+    private String title;
 
     @Override
     public boolean equals(Object o) {

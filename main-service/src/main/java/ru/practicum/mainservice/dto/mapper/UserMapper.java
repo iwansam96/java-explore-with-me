@@ -1,9 +1,12 @@
 package ru.practicum.mainservice.dto.mapper;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.practicum.mainservice.dto.UserDto;
 import ru.practicum.mainservice.dto.UserShortDto;
 import ru.practicum.mainservice.models.User;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserMapper {
     public static UserDto toUserDto(User user) {
         UserDto userDto = new UserDto();

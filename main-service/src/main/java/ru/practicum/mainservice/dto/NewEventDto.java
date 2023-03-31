@@ -15,28 +15,28 @@ import java.time.LocalDateTime;
 public class NewEventDto {
 
     @NotBlank
-    String annotation;
+    private String annotation;
 
     @NotNull
-    Long category;
+    private Long category;
 
     @NotBlank
-    String description;
+    private String description;
 
     @NotNull
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime eventDate;
+    private LocalDateTime eventDate;
 
     @NotNull
-    Location location;
+    private Location location;
 
-    Boolean paid;
+    private Boolean paid;
 
-    Long participantLimit;
+    private Long participantLimit;
 
-    Boolean requestModeration;
+    private Boolean requestModeration;
 
     @NotBlank
-    String title;
+    private String title;
 }

@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class UpdateCompilationRequest {
-    List<Long> events;
-    Boolean pinned;
-    String title;
+    private List<Long> events;
+    private Boolean pinned;
+    private String title;
 }

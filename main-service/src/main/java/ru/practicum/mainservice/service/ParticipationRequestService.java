@@ -2,6 +2,7 @@ package ru.practicum.mainservice.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.mainservice.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.mainservice.dto.EventRequestStatusUpdateResult;
 import ru.practicum.mainservice.dto.ParticipationRequestDto;
@@ -36,6 +37,7 @@ public class ParticipationRequestService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public EventRequestStatusUpdateResult setRequestsStatus(
             EventRequestStatusUpdateRequest updateRequest, Long eventId, Long userId) {
 
@@ -102,6 +104,7 @@ public class ParticipationRequestService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public ParticipationRequestDto save(Long userId, Long eventId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null)
@@ -147,6 +150,7 @@ public class ParticipationRequestService {
         return ParticipationRequestMapper.toParticipationRequestDto(savedRequest);
     }
 
+    @Transactional
     public ParticipationRequestDto cancel(Long userId, Long requestId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null)

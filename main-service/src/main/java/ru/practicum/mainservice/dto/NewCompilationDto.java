@@ -9,11 +9,11 @@ import java.util.List;
 @Data
 public class NewCompilationDto {
     @NotNull
-    List<Long> events;
+    private List<Long> events;
 
     @NotNull
-    Boolean pinned;
+    private Boolean pinned;
 
     @NotBlank
-    String title;
+    private String title;
 }

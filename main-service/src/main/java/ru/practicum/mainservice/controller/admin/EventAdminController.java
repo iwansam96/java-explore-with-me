@@ -4,13 +4,14 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.mainservice.dto.EventFullDto;
 import ru.practicum.mainservice.dto.UpdateEventAdminRequest;
 import ru.practicum.mainservice.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
 @RequestMapping("/admin/events")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class EventAdminController {
     private final EventService eventService;
 
@@ -28,8 +30,8 @@ public class EventAdminController {
                                       @RequestParam(required = false) List<Long> categories,
                                       @RequestParam(required = false) @JsonSerialize(using = LocalDateTimeSerializer.class) LocalDateTime rangeStart,
                                       @RequestParam(required = false) @JsonSerialize(using = LocalDateTimeSerializer.class) LocalDateTime rangeEnd,
-                                      @RequestParam(defaultValue = "0") Integer from,
-                                      @RequestParam(defaultValue = "10") Integer size,
+                                      @Min(0) @RequestParam(defaultValue = "0") Integer from,
+                                      @Min(0) @RequestParam(defaultValue = "10") Integer size,
                                       HttpServletRequest request) {
         log.info("GET /admin/events");
         String uri = request.getRequestURI();
@@ -37,7 +39,7 @@ public class EventAdminController {
     }
 
     @PatchMapping("/{eventId}")
-    public EventFullDto update(@Valid @NotNull @PathVariable Long eventId,
+    public EventFullDto update(@Min(0) @NotNull @PathVariable Long eventId,
                                 @RequestBody UpdateEventAdminRequest updateEventAdminRequest,
                                HttpServletRequest request) {
         log.info("PATCH /admin/events/{}", eventId);

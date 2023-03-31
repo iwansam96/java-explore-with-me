@@ -3,6 +3,7 @@ package ru.practicum.mainservice.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.mainservice.dto.CompilationDto;
 import ru.practicum.mainservice.dto.NewCompilationDto;
 import ru.practicum.mainservice.dto.UpdateCompilationRequest;
@@ -47,6 +48,7 @@ public class CompilationService {
         return CompilationMapper.toCompilationDto(compilation);
     }
 
+    @Transactional
     public CompilationDto save(NewCompilationDto compilationDto) {
         List<Event> events = new ArrayList<>();
         if (compilationDto.getEvents() != null && !compilationDto.getEvents().isEmpty()) {
@@ -57,6 +59,7 @@ public class CompilationService {
         return CompilationMapper.toCompilationDto(savedCompilation);
     }
 
+    @Transactional
     public CompilationDto update(UpdateCompilationRequest compilationDto, Long compilationId) {
         Compilation compilationToUpdate = compilationRepository.findById(compilationId).orElse(null);
         if (compilationToUpdate == null)
@@ -73,6 +76,7 @@ public class CompilationService {
         return CompilationMapper.toCompilationDto(savedCompilation);
     }
 
+    @Transactional
     public void delete(Long compilationId) {
         Compilation compilationToDelete = compilationRepository.findById(compilationId).orElse(null);
         if (compilationToDelete == null)
