@@ -10,6 +10,7 @@ import ru.practicum.mainservice.models.User;
 import ru.practicum.stats.dto.EventInputDto;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EventMapper {
@@ -62,6 +63,11 @@ public class EventMapper {
         eventFullDto.setState(event.getState());
         eventFullDto.setTitle(event.getTitle());
         eventFullDto.setViews(views);
+        if (event.getComments() != null)
+            eventFullDto.setComments(event.getComments().stream()
+                .map(CommentMapper::toCommentDto)
+                .collect(Collectors.toList())
+            );
         return eventFullDto;
     }
 

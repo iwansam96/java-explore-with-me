@@ -119,13 +119,13 @@ public class EventService {
 
         eventClient.addStat(new EventInputDto("ewm-main", uri, ip));
 
-        Long hits = getEventHits(uri, event);
-
         return EventMapper.toEventFullDto(
                 event,
-                hits
+                getEventHits(uri, event)
         );
     }
+
+
 
 
     public List<EventShortDto> getShort(Long userId, Integer from, Integer size, String uri) {

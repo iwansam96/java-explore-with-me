@@ -1,5 +1,7 @@
 package ru.practicum.mainservice.models;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -16,6 +18,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Entity
 @Table(name = "participation_requests", schema = "public")
+@JsonIdentityInfo(property = "id", generator = ObjectIdGenerators.PropertyGenerator.class)
 public class ParticipationRequest {
 
     @Id
@@ -28,7 +31,7 @@ public class ParticipationRequest {
     private LocalDateTime created;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "participation_request_event", referencedColumnName = "event_id", nullable = false)
     private Event event;
 
