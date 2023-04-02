@@ -90,12 +90,4 @@ public class BusinessExceptionHandler {
         return new ResponseEntity<>("{\"status\": \"" + e.getMessage() + "\"}", HttpStatus.FORBIDDEN);
     }
 
-
-    @ExceptionHandler
-    public ResponseEntity<Object> habdleThrowable(final Throwable e) {
-        log.error("500 {}", e.getMessage());
-        e.printStackTrace();
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
 }
