@@ -2,6 +2,7 @@ package ru.practicum.mainservice.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.mainservice.dto.CommentDto;
 import ru.practicum.mainservice.dto.CommentDtoInput;
 import ru.practicum.mainservice.dto.mapper.CommentMapper;
@@ -26,6 +27,7 @@ public class CommentService {
     private final UserRepository userRepository;
 
 //    Private
+    @Transactional
     public CommentDto add(Long userId, Long eventId, CommentDtoInput commentDtoInput) {
         Event event = eventRepository.findById(eventId).orElse(null);
         if (event == null)
@@ -56,6 +58,7 @@ public class CommentService {
         return CommentMapper.toCommentDto(newComment);
     }
 
+    @Transactional
     public CommentDto edit(Long userId, Long eventId, Long commentId, CommentDtoInput commentDtoInput) {
         Event event = eventRepository.findById(eventId).orElse(null);
         if (event == null)
@@ -77,6 +80,7 @@ public class CommentService {
         return CommentMapper.toCommentDto(newComment);
     }
 
+    @Transactional
     public void delete(Long userId, Long eventId, Long commentId) {
         Event event = eventRepository.findById(eventId).orElse(null);
         if (event == null)
@@ -98,6 +102,7 @@ public class CommentService {
 
 
 //    Admin
+    @Transactional
     public CommentDto edit(Long eventId, Long commentId, CommentDtoInput commentDtoInput) {
         Event event = eventRepository.findById(eventId).orElse(null);
         if (event == null)
@@ -112,6 +117,7 @@ public class CommentService {
         return CommentMapper.toCommentDto(newComment);
     }
 
+    @Transactional
     public void delete(Long eventId, Long commentId) {
         Event event = eventRepository.findById(eventId).orElse(null);
         if (event == null)
