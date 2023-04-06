@@ -1,5 +1,7 @@
 package ru.practicum.mainservice.models;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
 
@@ -12,6 +14,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Entity
 @Table(name = "users", schema = "public")
+@JsonIdentityInfo(property = "id", generator = ObjectIdGenerators.PropertyGenerator.class)
 public class User {
 
     @Id
@@ -28,7 +31,15 @@ public class User {
     @Column(name = "user_name")
     private String name;
 
-    @OneToMany(mappedBy = "requester")
+    public List<ParticipationRequest> getRequests() {
+        return requests;
+    }
+
+    public void setRequests(List<ParticipationRequest> requests) {
+        this.requests = requests;
+    }
+
+    @OneToMany(mappedBy = "requester", fetch = FetchType.LAZY)
     private List<ParticipationRequest> requests;
 
     public Long getId() {

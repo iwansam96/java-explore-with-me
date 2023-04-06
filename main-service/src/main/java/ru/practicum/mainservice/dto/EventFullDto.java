@@ -4,12 +4,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Data;
-import ru.practicum.mainservice.models.Category;
-import ru.practicum.mainservice.models.EventState;
-import ru.practicum.mainservice.models.Location;
-import ru.practicum.mainservice.models.User;
+import ru.practicum.mainservice.models.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class EventFullDto {
@@ -61,4 +59,6 @@ public class EventFullDto {
 
     //    Количество просмотрев события
     private Long views;
+
+    private List<CommentDto> comments;
 }

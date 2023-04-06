@@ -1,6 +1,8 @@
 package ru.practicum.mainservice.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Getter;
@@ -21,6 +23,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Entity
 @Table(name = "events", schema = "public")
+@JsonIdentityInfo(property = "id", generator = ObjectIdGenerators.PropertyGenerator.class)
 public class Event {
 
     @Id
@@ -98,8 +101,11 @@ public class Event {
     @ManyToMany
     private List<Compilation> compilations;
 
-    @OneToMany(mappedBy = "event")
+    @OneToMany(mappedBy = "event", fetch = FetchType.LAZY)
     private List<ParticipationRequest> requests;
+
+    @OneToMany(mappedBy = "event", fetch = FetchType.LAZY)
+    private List<Comment> comments;
 
     @Override
     public boolean equals(Object o) {
